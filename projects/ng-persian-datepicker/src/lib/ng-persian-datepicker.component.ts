@@ -409,89 +409,91 @@ export class NgPersianDatepickerComponent implements OnInit, OnDestroy {
   }
 
   setDays(): void {
-    this.days = [];
+  this.days = [];
 
-    const prevMonthDetails: number[][] = [];
-    const currentMonthDetails: number[][] = [];
-    const nextMonthDetails: number[][] = [];
+  const prevMonthDetails: number[][] = [];
+  const currentMonthDetails: number[][] = [];
+  const nextMonthDetails: number[][] = [];
 
-    const prevMonth = Jalali.timestamp(+this.viewDate, false);
-    const currentMonth = Jalali.timestamp(+this.viewDate, false);
-    const nextMonth = Jalali.timestamp(+this.viewDate, false);
+  const prevMonth = Jalali.timestamp(+this.viewDate, false);
+  const currentMonth = Jalali.timestamp(+this.viewDate, false);
+  const nextMonth = Jalali.timestamp(+this.viewDate, false);
 
-    if (this.calendarIsGregorian) {
-      prevMonth.date.setMonth(prevMonth.date.getMonth() - 1);
-      nextMonth.date.setMonth(nextMonth.date.getMonth() + 1);
-    } else {
-      prevMonth.add(-1, 'month');
-      nextMonth.add(1, 'month');
-    }
-
-    const gregorianMonthDays = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-    const currentMonthDays: number = this.calendarIsGregorian ? gregorianMonthDays(currentMonth.date) : currentMonth.monthLength();
-    const prevMonthDays: number = this.calendarIsGregorian ? gregorianMonthDays(prevMonth.date) : prevMonth.monthLength();
-    const nextMonthDays: number = this.calendarIsGregorian ? gregorianMonthDays(nextMonth.date) : nextMonth.monthLength();
-
-    for (let i = 0 ; i < prevMonthDays ; i++) {
-      if (this.calendarIsGregorian) {
-        prevMonthDetails.push([+prevMonth.date, prevMonth.date.getFullYear(), prevMonth.date.getMonth(), prevMonth.date.getDate()]);
-      } else {
-        prevMonthDetails.push([+prevMonth, prevMonth.getFullYear(), prevMonth.getMonth(), prevMonth.getDate()]);
-      }
-      prevMonth.add(1, 'day');
-    }
-    for (let i = 0 ; i < currentMonthDays ; i++) {
-      if (this.calendarIsGregorian) {
-        currentMonthDetails.push([+currentMonth, currentMonth.date.getFullYear(), currentMonth.date.getMonth(), currentMonth.date.getDate()]);
-      } else {
-        currentMonthDetails.push([+currentMonth, currentMonth.getFullYear(), currentMonth.getMonth(), currentMonth.getDate()]);
-      }
-      currentMonth.add(1, 'day');
-    }
-    for (let i = 0 ; i < nextMonthDays ; i++) {
-      if (this.calendarIsGregorian) {
-        nextMonthDetails.push([+nextMonth, nextMonth.date.getFullYear(), nextMonth.date.getMonth(), nextMonth.date.getDate()]);
-      } else {
-        nextMonthDetails.push([+nextMonth, nextMonth.getFullYear(), nextMonth.getMonth(), nextMonth.getDate()]);
-      }
-      nextMonth.add(1, 'day');
-    }
-
-    for (let row = 0; row < 6 ; row++) {
-      const rowValue: IDay[] = [];
-
-      for (let col = 0; col < 7 ; col++) {
-        const fromPrevMonth: number = this.calendarIsGregorian ?
-          this.viewDate.date.getDay() :
-          (this.viewDate.date.getDay() === 6) ? 0 : (this.viewDate.date.getDay() + 1);
-        let index: number = ((row * 7) + col) - fromPrevMonth;
-        let day: number[] = [];
-
-        if (index < 0) {
-          index = prevMonthDetails.length - (fromPrevMonth - col);
-          day = prevMonthDetails[index];
-        } else if (index >= currentMonthDetails.length) {
-          index = index - currentMonthDetails.length;
-          day = nextMonthDetails[index];
-        } else {
-          day = currentMonthDetails[index];
-        }
-
-        rowValue.push({
-          timestamp: day[0],
-          year: day[1],
-          monthIndex: day[2],
-          value: day[3],
-          isDayInCurrentMonth: this.isDayInCurrentMonth(day),
-          isDayOfTodayDate: this.isDayOfTodayDate(day),
-          isDayOfSelectedDate: this.isDayOfSelectedDate(day),
-          isDayDisabled: this.isDayDisabled(day)
-        });
-      }
-
-      this.days.push(rowValue);
-    }
+  if (this.calendarIsGregorian) {
+    prevMonth.date.setMonth(prevMonth.date.getMonth() - 1);
+    nextMonth.date.setMonth(nextMonth.date.getMonth() + 1);
+  } else {
+    prevMonth.add(-1, 'month');
+    nextMonth.add(1, 'month');
   }
+
+  const gregorianMonthDays = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  const currentMonthDays = this.calendarIsGregorian ? gregorianMonthDays(currentMonth.date) : currentMonth.monthLength();
+  const prevMonthDays = this.calendarIsGregorian ? gregorianMonthDays(prevMonth.date) : prevMonth.monthLength();
+  const nextMonthDays = this.calendarIsGregorian ? gregorianMonthDays(nextMonth.date) : nextMonth.monthLength();
+
+  for (let i = 0; i < prevMonthDays; i++) {
+    const dateArray = this.calendarIsGregorian
+      ? [+prevMonth.date, prevMonth.date.getFullYear(), prevMonth.date.getMonth(), prevMonth.date.getDate()]
+      : [+prevMonth, prevMonth.getFullYear(), prevMonth.getMonth(), prevMonth.getDate()];
+    prevMonthDetails.push(dateArray);
+    prevMonth.add(1, 'day');
+  }
+
+  for (let i = 0; i < currentMonthDays; i++) {
+    const dateArray = this.calendarIsGregorian
+      ? [+currentMonth, currentMonth.date.getFullYear(), currentMonth.date.getMonth(), currentMonth.date.getDate()]
+      : [+currentMonth, currentMonth.getFullYear(), currentMonth.getMonth(), currentMonth.getDate()];
+    currentMonthDetails.push(dateArray);
+    currentMonth.add(1, 'day');
+  }
+
+  for (let i = 0; i < nextMonthDays; i++) {
+    const dateArray = this.calendarIsGregorian
+      ? [+nextMonth, nextMonth.date.getFullYear(), nextMonth.date.getMonth(), nextMonth.date.getDate()]
+      : [+nextMonth, nextMonth.getFullYear(), nextMonth.getMonth(), nextMonth.getDate()];
+    nextMonthDetails.push(dateArray);
+    nextMonth.add(1, 'day');
+  }
+
+  // 🧠 اصلاح مهم: محاسبه صحیح اولین روز هفته
+  const startDayOfWeek = this.calendarIsGregorian
+    ? this.viewDate.date.getDay()
+    : (this.viewDate.date.getDay() + 1) % 7;
+
+  for (let row = 0; row < 6; row++) {
+    const rowValue: IDay[] = [];
+
+    for (let col = 0; col < 7; col++) {
+      let index = (row * 7 + col) - startDayOfWeek;
+      let day: number[];
+
+      if (index < 0) {
+        const idx = prevMonthDetails.length + index;
+        day = prevMonthDetails[idx];
+      } else if (index >= currentMonthDetails.length) {
+        const idx = index - currentMonthDetails.length;
+        day = nextMonthDetails[idx];
+      } else {
+        day = currentMonthDetails[index];
+      }
+
+      rowValue.push({
+        timestamp: day[0],
+        year: day[1],
+        monthIndex: day[2],
+        value: day[3],
+        isDayInCurrentMonth: this.isDayInCurrentMonth(day),
+        isDayOfTodayDate: this.isDayOfTodayDate(day),
+        isDayOfSelectedDate: this.isDayOfSelectedDate(day),
+        isDayDisabled: this.isDayDisabled(day)
+      });
+    }
+
+    this.days.push(rowValue);
+  }
+}
+
 
   setViewDateTitle(): void {
     if (!this.viewDate) {
